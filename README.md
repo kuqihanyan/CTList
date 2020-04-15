@@ -6,6 +6,7 @@
 - 支持隐藏指定文件夹和文件
 - 支持整个目录,单层目录或单文件访问加密
 - 支持展示任意目录,自定义根目录
+- 支持只读挂载到 `PotPlayer(WebDAV)`, `nPlayer(WebDAV)`
 
 # 配置文件
 #### 无特殊需要,只需要填写账号密码即可 (前4项). 修改配置后需重新启动 `CTList` .
@@ -17,10 +18,10 @@
                                                         ## 0: 关闭, 1: 打开
                                                         
         "UserName": "",                                 # Input Phone Number.
-                                                        ## 天翼云网盘登陆用户名.
+                                                        ## 天翼云网盘登陆用户名(不要带上'@189.cn').
                                                         
         "Password": "",                                 # Input Password.
-                                                        ## 天翼云网盘登陆密码
+                                                        ## 天翼云网盘登陆密码.
                                                         
         "CaptchaMode": "0",                             # Captcha Mode. 0: Auto Reject, 1: Manual Input, other: API URL. 
                                                         ## 验证码. 0: 遇到验证码拒绝登陆, 1: 手动输入验证, 其他: 自动识别验证码的API.
@@ -64,6 +65,17 @@
 # ./CTList -a "<AUTH_TOKEN_32>"
 # 直接监听公网.
 # ./CTList -a "<AUTH_TOKEN_32>" -bind 0.0.0.0 -port 80
+```
+
+# 访问地址
+#### 根据配置文件中的`SubPath`项中参数访问具体网盘
+#### 一般 `SubPath` 的具体值在终端中显示在中括号内. 比如: `[/CTList]`
+```
+例如: "SubPath": "/CTList"
+访问: http://127.0.0.1:5189/CTList
+
+例如: "SubPath": "/"
+访问: http://127.0.0.1:5189/
 ```
 
 # 后台运行及开机自启
@@ -179,6 +191,26 @@ Usage of CTList:
         proxy_set_header X-Real-IP $remote_addr;
         proxy_pass http://127.0.0.1:5189;
     }
+```
+
+# 在`nPlayer`播放器中使用
+```
+# 网络 --> 添加 --> WebDAV
+# 主机: 填写域名.
+# 路径: 填写 SubPath 值. 如: /CTList
+# 如果是 HTTPS 站点, 请选中 HTTPS .
+# 其他请按照情况填写. 
+
+# 优势: 在播放器中可以播放各种编码格式的视频.
+# 可以适当的将最小缓存时间调小,提高浏览体验.
+```
+
+# 报错相关
+```
+400(Not Found URL): 未能找到该文件的链接.
+404(Not Found): 未完成初次缓存目录结构或文件路径不正确.
+422(Not Found Real URL): 未能生成真实的文件下载链接(一般是文件被举报了,无法下载).
+5XX: 一般是服务器端的问题. 部分可能的情况有: 主程序没开, 端口不通, 反代配置不正确.
 ```
 
 # 天翼云网盘登陆验证码识别API(基于开源OCR识别)
